@@ -111,8 +111,10 @@ public class Form {
                     JOptionPane.showMessageDialog(frame, "Image compressed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                     imageLabelType.setText("Compressed Image: ");
                     displayImage(compressedImage);
-                    compressButton.setVisible(false);
-                    saveCompressedImageButton.setVisible(true);
+                    if (imageLabel.getIcon() != null) {
+                        compressButton.setVisible(false);
+                        saveCompressedImageButton.setVisible(true);
+                    }
                 }
             }
         });
@@ -137,10 +139,14 @@ public class Form {
             });
             if (fileChooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
                 selectedFile = fileChooser.getSelectedFile();
-                browseButton.setText(selectedFile.getName());
-                imageLabelType.setText("Original Image: ");
-                compressButton.setVisible(true);
-                displayImage(selectedFile);
+                if (isImage(selectedFile)) {
+                    displayImage(selectedFile);
+                    browseButton.setText(selectedFile.getName());
+                    imageLabelType.setText("Original Image: ");
+                    compressButton.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(frame, "You have to choose an Image with (*.jpg, *.jpeg, *.png, *.bmp, *.gif) extensions only!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
         return browseButton;
