@@ -10,8 +10,10 @@ public class Form {
     private JFrame frame;
     private JLabel imageLabel;
     private JLabel imageLabelType;
+    JButton browseButton;
     JButton compressButton;
     JButton saveCompressedImageButton;
+    JButton clearImageButton;
     private File selectedFile;
     private File compressedImage;
     private final Dimension MIN_FRAME_DIMENSION;
@@ -123,7 +125,7 @@ public class Form {
     }
 
     private JButton initializeBrowseButton() {
-        JButton browseButton = new JButton("Browse");
+        browseButton = new JButton("Browse");
         browseButton.setFont(new Font(Font.SANS_SERIF, Font.BOLD, FONT_SIZE));
         browseButton.setMargin(new Insets(10, 20, 10, 20));
         browseButton.setMinimumSize(new Dimension(100, 50));
@@ -142,6 +144,7 @@ public class Form {
                 if (isImage(selectedFile)) {
                     displayImage(selectedFile);
                     browseButton.setText(selectedFile.getName());
+                    clearImageButton.setVisible(true);
                     imageLabelType.setText("Original Image: ");
                     compressButton.setVisible(true);
                 } else {
@@ -157,12 +160,41 @@ public class Form {
         chooseImagePanel.setLayout(new BoxLayout(chooseImagePanel, BoxLayout.Y_AXIS));
 
         JPanel browsePanel = initializeBrowsePanel();
+        JPanel clearImagePanel = initializeClearImagePanel();
         JPanel imagePanel = initializeImagePanel();
 
+        browsePanel.add(clearImagePanel);
         chooseImagePanel.add(browsePanel);
         chooseImagePanel.add(imagePanel);
 
         return chooseImagePanel;
+    }
+
+    private JPanel initializeClearImagePanel() {
+        JPanel clearImagePanel = new JPanel();
+
+        JButton clearImageButton = initializeClearImageButton();
+        clearImagePanel.add(clearImageButton);
+
+        return clearImagePanel;
+    }
+
+    private JButton initializeClearImageButton() {
+        clearImageButton = new JButton("Clear Image");
+        clearImageButton.setFont(new Font(Font.SANS_SERIF, Font.BOLD, FONT_SIZE));
+        clearImageButton.setMargin(new Insets(10, 10, 10, 10));
+        clearImageButton.setPreferredSize(new Dimension(150, 50));
+        clearImageButton.addActionListener(e -> {
+            imageLabel.setIcon(null);
+            browseButton.setText("Browse Image");
+            imageLabelType.setText("No Image Selected");
+            compressButton.setVisible(false);
+            saveCompressedImageButton.setVisible(false);
+            clearImageButton.setVisible(false);
+            frame.pack();
+        });
+        clearImageButton.setVisible(false);
+        return clearImageButton;
     }
 
     private JPanel initializeBrowsePanel() {
