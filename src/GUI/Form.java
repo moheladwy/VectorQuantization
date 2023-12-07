@@ -9,6 +9,7 @@ import Logic.VectorQuantization;
 public class Form {
     private JFrame frame;
     private JLabel imageLabel;
+    private JLabel imageLabelType;
     private File selectedFile;
     private File compressedImage;
     private final Dimension MIN_FRAME_DIMENSION;
@@ -18,7 +19,7 @@ public class Form {
     public Form() {
         MIN_FRAME_DIMENSION = new Dimension(800, 240);
         IMAGE_DIMENSION = new Dimension(1200, 800);
-        FONT_SIZE = 16;
+        FONT_SIZE = 20;
         InitializeFrame();
     }
 
@@ -80,15 +81,15 @@ public class Form {
         compressButton.setPreferredSize(new Dimension(150, 50));
 
         compressButton.addActionListener(e -> {
-            if (selectedFile == null) {
+            if (selectedFile == null)
                 JOptionPane.showMessageDialog(frame, "You have to choose an Image first!", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
+            else {
                 compressedImage = VectorQuantization.compress(selectedFile);
-                if (compressedImage == null) {
+                if (compressedImage == null)
                     JOptionPane.showMessageDialog(frame, "Error occurred while compressing the image!", "Error", JOptionPane.ERROR_MESSAGE);
-                }
                 else {
                     JOptionPane.showMessageDialog(frame, "Image compressed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    imageLabelType.setText("Compressed Image: ");
                     displayImage(compressedImage);
                 }
             }
@@ -114,6 +115,7 @@ public class Form {
             if (fileChooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
                 selectedFile = fileChooser.getSelectedFile();
                 browseButton.setText(selectedFile.getName());
+                imageLabelType.setText("Original Image: ");
                 displayImage(selectedFile);
             }
         });
@@ -151,12 +153,17 @@ public class Form {
         JPanel imagePanel = new JPanel();
         imagePanel.setMaximumSize(new Dimension(1200, 800));
 
+        imageLabelType = new JLabel();
+        imageLabelType.setText("No Image Selected");
+        imageLabelType.setFont(new Font(Font.SANS_SERIF, Font.BOLD, FONT_SIZE));
+
         imageLabel = new JLabel();
         imageLabel.setHorizontalAlignment(JLabel.CENTER);
         imageLabel.setVerticalAlignment(JLabel.CENTER);
         imageLabel.setMinimumSize(new Dimension(1, 1));
         imageLabel.setMaximumSize(IMAGE_DIMENSION);
 
+        imagePanel.add(imageLabelType);
         imagePanel.add(imageLabel);
         return imagePanel;
     }
@@ -187,8 +194,7 @@ public class Form {
                     imageLabel.getIcon().getIconHeight()));
             frame.pack();
         } catch (IOException e) {
-            Dialog dialog = new Dialog(frame, "Error", Boolean.parseBoolean(e.getMessage()));
-            dialog.setVisible(true);
+            JOptionPane.showMessageDialog(frame, "Error occurred while displaying the image!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
