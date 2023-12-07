@@ -116,6 +116,7 @@ public class Form {
                 }
             }
         });
+        compressButton.setVisible(false);
         return compressButton;
     }
 
@@ -138,6 +139,7 @@ public class Form {
                 selectedFile = fileChooser.getSelectedFile();
                 browseButton.setText(selectedFile.getName());
                 imageLabelType.setText("Original Image: ");
+                compressButton.setVisible(true);
                 displayImage(selectedFile);
             }
         });
