@@ -13,7 +13,11 @@ public class VectorQuantization {
         return null;
     }
 
-    private void decompress() {
+    private void LBG() {
+        // TODO: Implement LBG algorithm.
+    }
+
+    private void decode() {
         // TODO: Implement decompression algorithm.
     }
 
