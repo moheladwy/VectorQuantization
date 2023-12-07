@@ -1,10 +1,12 @@
 package Logic;
-
+import Models.Vector;
 import java.io.File;
+import java.util.HashMap;
 
 public class VectorQuantization {
     private File originalImage;
     private File compressedImage;
+    private HashMap<Integer, Vector> codebook;
 
     public static File compress(File image) {
         // TODO: Implement compression algorithm.
@@ -13,10 +15,6 @@ public class VectorQuantization {
 
     private void decompress() {
         // TODO: Implement decompression algorithm.
-    }
-
-    private void saveOriginalImage() {
-        // TODO: Implement saving original image.
     }
 
     public static void saveCompressedImage(File compressedImage) {
