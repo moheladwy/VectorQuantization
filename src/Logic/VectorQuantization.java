@@ -19,7 +19,7 @@ public class VectorQuantization {
         // TODO: Implement saving original image.
     }
 
-    private void saveCompressedImage() {
+    public static void saveCompressedImage(File compressedImage) {
         // TODO: Implement saving compressed image.
     }
 

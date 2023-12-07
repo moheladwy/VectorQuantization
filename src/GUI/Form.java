@@ -10,6 +10,8 @@ public class Form {
     private JFrame frame;
     private JLabel imageLabel;
     private JLabel imageLabelType;
+    JButton compressButton;
+    JButton saveCompressedImageButton;
     private File selectedFile;
     private File compressedImage;
     private final Dimension MIN_FRAME_DIMENSION;
@@ -64,13 +66,31 @@ public class Form {
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JButton compressButton = initializeCompressionButton();
+        compressButton = initializeCompressionButton();
+        saveCompressedImageButton = initializeSaveCompressedImageButton();
 
         // Add a rigid area to increase the distance between buttons to 30 pixels
         panel.add(Box.createRigidArea(new Dimension(30, 0)));
         panel.add(compressButton);
+        panel.add(Box.createRigidArea(new Dimension(30, 0)));
+        panel.add(saveCompressedImageButton);
 
         return panel;
+    }
+
+    private JButton initializeSaveCompressedImageButton() {
+        JButton saveCompressedImageButton = new JButton("Save Compressed Image");
+        saveCompressedImageButton.setFont(new Font(Font.SANS_SERIF, Font.BOLD, FONT_SIZE));
+        saveCompressedImageButton.setMargin(new Insets(10, 10, 10, 10));
+        saveCompressedImageButton.setPreferredSize(new Dimension(150, 50));
+        saveCompressedImageButton.addActionListener(e -> {
+            if (compressedImage == null)
+                JOptionPane.showMessageDialog(frame, "You have to compress an Image first!", "Error", JOptionPane.ERROR_MESSAGE);
+            else
+                VectorQuantization.saveCompressedImage(compressedImage);
+        });
+        saveCompressedImageButton.setVisible(false);
+        return saveCompressedImageButton;
     }
 
     private JButton initializeCompressionButton() {
@@ -91,6 +111,8 @@ public class Form {
                     JOptionPane.showMessageDialog(frame, "Image compressed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                     imageLabelType.setText("Compressed Image: ");
                     displayImage(compressedImage);
+                    compressButton.setVisible(false);
+                    saveCompressedImageButton.setVisible(true);
                 }
             }
         });
