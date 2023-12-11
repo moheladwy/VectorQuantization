@@ -2,8 +2,11 @@ package GUI;
 import javax.swing.*;
 import java.awt.*;
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+
+import Logic.ImageHelper;
 import Logic.VectorQuantization;
 
 public class Form {
@@ -12,10 +15,11 @@ public class Form {
     private JLabel imageLabelType;
     JButton browseButton;
     JButton compressButton;
-    JButton saveCompressedImageButton;
     JButton clearImageButton;
     private File selectedFile;
-    private File compressedImage;
+    private File compressedFile;
+    private File decompressedFile;
+    private BufferedImage decompressedImage;
     private final Dimension MIN_FRAME_DIMENSION;
     private final Dimension IMAGE_DIMENSION;
     private final int FONT_SIZE;
@@ -69,31 +73,14 @@ public class Form {
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         compressButton = initializeCompressionButton();
-        saveCompressedImageButton = initializeSaveCompressedImageButton();
 
         // Add a rigid area to increase the distance between buttons to 30 pixels
         panel.add(Box.createRigidArea(new Dimension(30, 0)));
         panel.add(compressButton);
-        panel.add(Box.createRigidArea(new Dimension(30, 0)));
-        panel.add(saveCompressedImageButton);
 
         return panel;
     }
 
-    private JButton initializeSaveCompressedImageButton() {
-        JButton saveCompressedImageButton = new JButton("Save Compressed Image");
-        saveCompressedImageButton.setFont(new Font(Font.SANS_SERIF, Font.BOLD, FONT_SIZE));
-        saveCompressedImageButton.setMargin(new Insets(10, 10, 10, 10));
-        saveCompressedImageButton.setPreferredSize(new Dimension(150, 50));
-        saveCompressedImageButton.addActionListener(e -> {
-            if (compressedImage == null)
-                JOptionPane.showMessageDialog(frame, "You have to compress an Image first!", "Error", JOptionPane.ERROR_MESSAGE);
-            else
-                VectorQuantization.saveCompressedImage(compressedImage);
-        });
-        saveCompressedImageButton.setVisible(false);
-        return saveCompressedImageButton;
-    }
 
     private JButton initializeCompressionButton() {
         JButton compressButton = new JButton("Compress");
@@ -106,16 +93,17 @@ public class Form {
             if (selectedFile == null)
                 JOptionPane.showMessageDialog(frame, "You have to choose an Image first!", "Error", JOptionPane.ERROR_MESSAGE);
             else {
-                compressedImage = VectorQuantization.compress(selectedFile);
-                if (compressedImage == null)
+                decompressedImage = VectorQuantization.compress(selectedFile);
+                if (decompressedImage == null)
                     JOptionPane.showMessageDialog(frame, "Error occurred while compressing the image!", "Error", JOptionPane.ERROR_MESSAGE);
                 else {
                     JOptionPane.showMessageDialog(frame, "Image compressed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                     imageLabelType.setText("Compressed Image: ");
-                    displayImage(compressedImage);
+                    decompressedFile = new File(ImageHelper.getDecompressedImageName(selectedFile));
+                    ImageHelper.saveImage(decompressedImage, decompressedFile);
+                    displayImage(decompressedFile);
                     if (imageLabel.getIcon() != null) {
                         compressButton.setVisible(false);
-                        saveCompressedImageButton.setVisible(true);
                     }
                 }
             }
@@ -189,7 +177,6 @@ public class Form {
             browseButton.setText("Browse Image");
             imageLabelType.setText("No Image Selected");
             compressButton.setVisible(false);
-            saveCompressedImageButton.setVisible(false);
             clearImageButton.setVisible(false);
             frame.pack();
         });
@@ -230,15 +217,6 @@ public class Form {
         return imagePanel;
     }
 
-    private static Image convertFileToImage(File file) {
-        try {
-            return ImageIO.read(file);
-        } catch (IOException e) {
-            System.err.println("Error: " + e.getMessage());
-            return null;
-        }
-    }
-
     private static boolean isImage(File image) {
         String extension = image.getName()
                                 .toLowerCase()
@@ -256,7 +234,8 @@ public class Form {
                     imageLabel.getIcon().getIconHeight()));
             frame.pack();
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(frame, "Error occurred while displaying the image!", "Error", JOptionPane.ERROR_MESSAGE);
+            // "Error occurred while displaying the image!"
+            JOptionPane.showMessageDialog(frame, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
