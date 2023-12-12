@@ -3,50 +3,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Vector {
-    private int[][] pixels;
-    private final Dimension dimension;
+    private int[][][] pixels;
+    private Dimension dimension;
 
-    public Vector(int[][] pixels, Dimension dimension) {
-        if (dimension == null)
-            throw new NullPointerException("Dimension cannot be null.");
-        this.dimension = dimension;
+    public Vector(int[][][] pixels, Dimension dimension) {
+        setDimension(dimension);
         setPixels(pixels);
     }
 
-    public void setPixels(int[][] pixels) {
-        if (pixels == null)
-            throw new NullPointerException("Pixels cannot be null.");
-        if (pixels.length != dimension.getHeight() || pixels[0].length != dimension.getWidth())
-            throw new IllegalArgumentException("Pixels must be of size " + dimension.getHeight() + "x" + dimension.getWidth() + "!");
-        this.pixels = pixels;
-    }
-
-    public void setPixel(int i, int j, int value) {
-        if (i < 0 || i >= dimension.getHeight() || j < 0 || j >= dimension.getWidth())
-            throw new IndexOutOfBoundsException("Index out of bounds.");
-        pixels[i][j] = value;
-    }
-
-    public int getPixel(int i, int j) {
-        if (i < 0 || i >= dimension.getHeight() || j < 0 || j >= dimension.getWidth())
-            throw new IndexOutOfBoundsException("Index out of bounds.");
-        return pixels[i][j];
-    }
-
-    public int[][] getPixels() {
-        return pixels;
-    }
-
-    public int getWidth() {
-        return dimension.getWidth();
-    }
-
-    public int getHeight() {
-        return dimension.getHeight();
-    }
-
-    public Dimension getDimension() {
-        return dimension;
+    public boolean equals(Vector vector) {
+        if (vector == null)
+            throw new NullPointerException("Vector cannot be null!");
+        if (vector.getHeight() != dimension.getHeight() || vector.getWidth() != dimension.getWidth())
+            return false;
+        for (int i = 0; i < dimension.getHeight(); i++)
+            for (int j = 0; j < dimension.getWidth(); j++)
+                for (int k = 0; k < 3; k++)
+                    if (pixels[i][j][k] != vector.getPixel(i, j, k))
+                        return false;
+        return true;
     }
 
     public int calculateDistance(Vector vector) {
@@ -55,85 +30,100 @@ public class Vector {
         int sum = 0;
         for (int i = 0; i < dimension.getHeight(); i++)
             for (int j = 0; j < dimension.getWidth(); j++)
-                sum += (int) ((getPixel(i, j) - vector.getPixel(i, j)) * (getPixel(i, j) - vector.getPixel(i, j)));
+                for (int k = 0; k < 3; k++)
+                    sum += ((getPixel(i, j, k) - vector.getPixel(i, j, k)) * (getPixel(i, j, k) - vector.getPixel(i, j, k)));
         return sum;
     }
 
     public static Vector average(List<Vector> list, Dimension dimension) {
-        Vector result = new Vector(new int[dimension.getHeight()][dimension.getWidth()], dimension);
+        Vector result = new Vector(new int[dimension.getHeight()][dimension.getWidth()][3], dimension);
         if (list.isEmpty()) return result;
         for (Vector vector : list) {
             for (int i = 0; i < dimension.getHeight(); i++) {
                 for (int j = 0; j < dimension.getWidth(); j++) {
-                    result.setPixel(i, j, (result.getPixel(i, j) + vector.getPixel(i, j)));
+                    for (int k = 0; k < 3; k++) {
+                        result.setPixel(i, j, k, (result.getPixel(i, j, k) + vector.getPixel(i, j, k)));
+                    }
                 }
             }
         }
         for (int i = 0; i < dimension.getHeight(); i++) {
             for (int j = 0; j < dimension.getWidth(); j++) {
-                result.setPixel(i, j, result.getPixel(i, j) / list.size());
-            }
-        }
-        return result;
-    }
-
-    public static List<Vector> split(Vector vector) {
-        if (vector == null)
-            throw new NullPointerException("Vector cannot be null.");
-        ArrayList<Vector> result = new ArrayList<>();
-        for (int i = 0; i < vector.getHeight(); i++) {
-            for (int j = 0; j < vector.getWidth(); j++) {
-                Vector newVector = new Vector(new int[vector.getHeight()][vector.getWidth()], vector.getDimension());
-                for (int x = 0; i < vector.getHeight(); i++) {
-                    for (int y = 0; j < vector.getWidth(); j++)
-                        newVector.setPixel(x, y, vector.getPixel(x + i, y + j));
+                for (int k = 0; k < 3; k++) {
+                    result.setPixel(i, j, k, result.getPixel(i, j, k) / list.size());
                 }
-                result.add(newVector);
             }
         }
         return result;
     }
 
-    public boolean equals(Vector vector) {
-        if (vector == null)
-            throw new NullPointerException("Vector cannot be null.");
-        if (vector.getHeight() != getHeight() || vector.getWidth() != getWidth())
-            return false;
-        for (int i = 0; i < dimension.getHeight(); i++)
-            for (int j = 0; j < dimension.getWidth(); j++)
-                if (getPixel(i, j) != vector.getPixel(i, j))
-                    return false;
-        return true;
-    }
-    
     public static List<List<Vector>> splitLBG(int level, List<Vector> vectors, Dimension dimension) {
         ArrayList<List<Vector>> result = new ArrayList<>();
         if (level == 0) {
             result.add(vectors);
             return result;
         }
-        ArrayList<Vector> smaller = new ArrayList<>();
-        ArrayList<Vector> larger = new ArrayList<>();
+        List<Vector> smaller = new ArrayList<>();
+        List<Vector> larger = new ArrayList<>();
 
         Vector avgFirst = Vector.average(vectors, dimension);
         Vector avgSecond = Vector.average(vectors, dimension);
 
-        for (int i = 0; i < avgSecond.getHeight(); i++) {
-            for (int j = 0; j < avgSecond.getWidth(); j++) {
-                avgSecond.setPixel(i, j, avgSecond.getPixel(i, j) + 1);
-            }
-        }
+        for (int i = 0; i < dimension.getHeight(); i++)
+            for (int j = 0; j < dimension.getWidth(); j++)
+                for (int k = 0; k < 3; k++)
+                    avgSecond.setPixel(i, j, k, avgSecond.getPixel(i, j, k) + 1);
 
         for (Vector vector : vectors) {
             if (vector.calculateDistance(avgFirst) > vector.calculateDistance(avgSecond))
                 larger.add(vector);
-            else
-                smaller.add(vector);
+            else smaller.add(vector);
         }
 
         result.addAll(splitLBG(level - 1, smaller, dimension));
         result.addAll(splitLBG(level - 1, larger, dimension));
-
         return result;
+    }
+
+    public int[][][] getPixels() {
+        return pixels;
+    }
+
+    public void setPixels(int[][][] pixels) {
+        if (pixels == null)
+            throw new NullPointerException("Pixels cannot be null!");
+        if (pixels.length != dimension.getHeight() || pixels[0].length != dimension.getWidth())
+            throw new IllegalArgumentException("The Dimension Height and Width must be equal to the pixel Height and Width!");
+        this.pixels = pixels;
+    }
+
+    public void setDimension(Dimension dimension) {
+        if (dimension == null)
+            throw new NullPointerException("Dimension cannot be null");
+        this.dimension = dimension;
+    }
+
+    public int getPixel(int i, int j, int k) {
+        if (i < 0 || i >= dimension.getHeight() || j < 0 || j >= dimension.getWidth() || k < 0 || k > 2)
+            throw new IllegalArgumentException("Index out of bounds.");
+        return pixels[i][j][k];
+    }
+
+    public void setPixel(int i, int j, int k, int value) {
+        if (i < 0 || i >= dimension.getHeight() || j < 0 || j >= dimension.getWidth() || k < 0 || k > 2)
+            throw new IllegalArgumentException("Index out of bounds.");
+        pixels[i][j][k] = value;
+    }
+
+    public Dimension getDimension() {
+        return dimension;
+    }
+
+    public int getWidth() {
+        return dimension.getWidth();
+    }
+
+    public int getHeight() {
+        return dimension.getHeight();
     }
 }

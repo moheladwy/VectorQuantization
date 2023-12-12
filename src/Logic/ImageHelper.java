@@ -1,6 +1,7 @@
 package Logic;
 import Models.Dimension;
 import Models.Vector;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -16,11 +17,13 @@ public class ImageHelper {
         }
     }
 
-    public static BufferedImage convertPixelsToBufferedImage(int[][] pixels, Dimension dimension) {
-        BufferedImage bufferedImage = new BufferedImage(dimension.getWidth(), dimension.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-        for (int i = 0; i < dimension.getHeight(); i++) {
-            for (int j = 0; j < dimension.getWidth(); j++)
-                bufferedImage.setRGB(j, i, pixels[i][j] << 16 | pixels[i][j] << 8 | pixels[i][j]);
+    public static BufferedImage convertPixelsToBufferedImage(int[][][] pixels, Dimension dimension2D) {
+        BufferedImage bufferedImage = new BufferedImage(dimension2D.getWidth(), dimension2D.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < dimension2D.getHeight(); i++) {
+            for (int j = 0; j < dimension2D.getWidth(); j++) {
+                int rgb = pixels[i][j][0] << 16 | pixels[i][j][1] << 8 | pixels[i][j][2];
+                bufferedImage.setRGB(j, i, rgb);
+            }
         }
         return bufferedImage;
     }
@@ -44,7 +47,7 @@ public class ImageHelper {
     }
 
     private static int optimalVectorSize(int number) {
-        for (int i = 4; i < number; i++) {
+        for (int i = 2; i < number; i++) {
             if (number % i != 0)
                 continue;
             return i;
@@ -66,12 +69,14 @@ public class ImageHelper {
         ArrayList<Vector> vectors = new ArrayList<>();
         for (int i = 0; i < image.getHeight(); i += vectorSize.getHeight()) {
             for (int j = 0; j < image.getWidth(); j += vectorSize.getWidth()) {
-                int[][] pixels = new int[vectorSize.getHeight()][vectorSize.getWidth()];
+                int[][][] pixels = new int[vectorSize.getHeight()][vectorSize.getWidth()][3];
                 for (int height = i; height < i + vectorSize.getHeight(); height++) {
                     for (int width = j; width < j + vectorSize.getWidth(); width++) {
                         int rgb = image.getRGB(width, height);
-                        int greyValue = (rgb >> 16) & 0xff;
-                        pixels[height - i][width - j] = greyValue;
+                        int redValue = (rgb >> 16) & 0xff;
+                        int greenValue = (rgb >> 8) & 0xff;
+                        int blueValue = rgb & 0xff;
+                        pixels[height - i][width - j] = new int[]{redValue, greenValue, blueValue};
                     }
                 }
                 vectors.add(new Vector(pixels, vectorSize));

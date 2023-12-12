@@ -29,6 +29,20 @@ public class VectorQuantization {
         setCompressedImage();
     }
 
+    private void setCompressedVectors() {
+        compressedVectors = new ArrayList<>();
+        for (Vector vector : vectors) {
+            int averageIndex = getBestCodebookIndex(vector, codebook);
+            compressedVectors.add(averageIndex);
+        }
+    }
+
+    private void setVectors(ArrayList<Vector> vectors) {
+        if (vectors == null || vectors.isEmpty())
+            throw new NullPointerException("Vectors cannot be null or empty.");
+        this.vectors = vectors;
+    }
+
     public static BufferedImage compress(File image) {
         if (image == null)
             throw new NullPointerException("Image cannot be null.");
@@ -39,7 +53,7 @@ public class VectorQuantization {
     }
 
     private void compress() {
-        try {
+            try {
             FileOutputStream fileOutputStream = new FileOutputStream(ImageHelper.getCompressedImageName(originalImage));
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
 
@@ -56,8 +70,7 @@ public class VectorQuantization {
 
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-    }
+        } }
 
     public static BufferedImage decompress(File originalImage) {
         try {
@@ -67,37 +80,39 @@ public class VectorQuantization {
 
             int height = (int) input.readObject();
             int width = (int) input.readObject();
-            Dimension originalDimension = new Dimension(width, height);
+            Dimension originalDimension2D = new Dimension(width, height);
             int vectorHeight = (int) input.readObject();
             int vectorWidth = (int) input.readObject();
-            Dimension vectorDimension = new Dimension(vectorWidth, vectorHeight);
+            Dimension vectorDimension2D = new Dimension(vectorWidth, vectorHeight);
             int codebookSize = (int) input.readObject();
             ArrayList<Vector> codebook = new ArrayList<>();
             for (int i = 0; i < codebookSize; i++)
-                codebook.add(new Vector((int[][]) input.readObject(), vectorDimension));
+                codebook.add(new Vector((int[][][]) input.readObject(), vectorDimension2D));
             ArrayList<Integer> compressedVectors = (ArrayList<Integer>) input.readObject();
 
-            return reconstruct(originalDimension, vectorDimension, codebook, compressedVectors);
+            return reconstruct(originalDimension2D, vectorDimension2D, codebook, compressedVectors);
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
 
     private static BufferedImage reconstruct(Dimension originalDimension, Dimension vectorDimension,
-                             ArrayList<Vector> codebook, ArrayList<Integer> compressedVectors) {
+                                             ArrayList<Vector> codebook, ArrayList<Integer> compressedVectors) {
         ArrayList<Vector> vectors = new ArrayList<>();
         for (int index : compressedVectors)
             vectors.add(codebook.get(index));
 
-        int[][] pixels = new int[originalDimension.getHeight()][originalDimension.getWidth()];
+        int[][][] pixels = new int[originalDimension.getHeight()][originalDimension.getWidth()][3];
         for (int i = 0; i < originalDimension.getHeight(); i++) {
-            int[] row = new int[originalDimension.getWidth()];
+            int[][] row = new int[originalDimension.getWidth()][3];
             for (int j = 0; j < originalDimension.getWidth(); j++) {
                 int vectorIndex = (i / vectorDimension.getHeight()) * (originalDimension.getWidth() / vectorDimension.getWidth()) + (j / vectorDimension.getWidth());
                 Vector vector = vectors.get(vectorIndex);
                 int vectorHeightIndex = i % vectorDimension.getHeight();
                 int vectorWidthIndex = j % vectorDimension.getWidth();
-                row[j] = vector.getPixel(vectorHeightIndex, vectorWidthIndex);
+                for (int k = 0; k < 3; k++) {
+                    row[j][k] = vector.getPixel(vectorHeightIndex, vectorWidthIndex, k);
+                }
             }
             pixels[i] = row;
         }
@@ -105,12 +120,7 @@ public class VectorQuantization {
     }
 
     private void setCodebookSize() {
-//        int power = 1;
-//        while (Math.pow(2, power) < vectors.size())
-//            power++;
-//        codebookSizeBits = power  - 1;
-//        codebookSize = (int) Math.pow(2, codebookSizeBits);
-        this.codebookSizeBits = 6;
+        this.codebookSizeBits = 5;
         this.codebookSize = (int) Math.pow(2, codebookSizeBits);
     }
 
@@ -142,14 +152,6 @@ public class VectorQuantization {
         codebook = averages;
     }
 
-    private void setCompressedVectors() {
-        compressedVectors = new ArrayList<>();
-        for (Vector vector : vectors) {
-            int averageIndex = getBestCodebookIndex(vector, codebook);
-            compressedVectors.add(averageIndex);
-        }
-    }
-
     private static int getBestCodebookIndex(Vector vector, ArrayList<Vector> books) {
         int averageIndex = -1;
         int distance = Integer.MAX_VALUE;
@@ -168,11 +170,5 @@ public class VectorQuantization {
         String extension = path.substring(path.lastIndexOf(".") + 1);
         String name = path.substring(0, path.lastIndexOf(".")) + "_compressed." + extension;
         compressedImage = new File(name);
-    }
-
-    private void setVectors(ArrayList<Vector> vectors) {
-        if (vectors == null || vectors.isEmpty())
-            throw new NullPointerException("Vectors cannot be null or empty.");
-        this.vectors = vectors;
     }
 }
