@@ -17,8 +17,10 @@ The `GUI` package contains the graphical user interface components.
 ## How to Use
 1. Run the program using the following command in the CLI, and a GUI window will appear:
 
-    javac Program.java #make sure to navigate in the project directory to run the command correct.
-    java Program.class
+
+        javac Program.java #make sure to navigate in the project directory to run the command correct.
+        java Program.class
+
    
 3. Click the "Browse" button to choose an image for compression.
 4. Press the "Compress" button to initiate the compression process.
