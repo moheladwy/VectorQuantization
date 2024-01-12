@@ -18,7 +18,7 @@ The `GUI` package contains the graphical user interface components.
 1. Run the program using the following command in the CLI, and a GUI window will appear:
 
 
-        javac Program.java #make sure to navigate in the project directory to run the command correct.
+        javac Program.java # make sure to navigate in the project directory to run the command correct.
         java Program.class
 
    
