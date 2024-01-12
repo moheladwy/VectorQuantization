@@ -36,7 +36,7 @@ The `GUI` package contains the graphical user interface components.
 - The compressed image will be saved in the same directory as the original with the filename appended "_compressed".
 
 ## Contributors
-- [moheladwy].
-- [Alialdin99].
+- [https://github.com/moheladwy].
+- [https://github.com/Alialdin99].
   
 Feel free to explore and modify the code to suit your needs. If you have any questions or suggestions, please contact me on my email: [mohamed.h.eladwy@gmail.com].
