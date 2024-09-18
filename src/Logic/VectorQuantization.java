@@ -1,6 +1,8 @@
 package Logic;
-import Models.*;
+
 import Models.Dimension;
+import Models.Vector;
+
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
@@ -59,8 +61,8 @@ public class VectorQuantization {
 
             objectOutputStream.writeObject(originalBufferedImage.getHeight());
             objectOutputStream.writeObject(originalBufferedImage.getWidth());
-            objectOutputStream.writeObject(optimalVectorSize.getHeight());
-            objectOutputStream.writeObject(optimalVectorSize.getWidth());
+            objectOutputStream.writeObject(optimalVectorSize.height());
+            objectOutputStream.writeObject(optimalVectorSize.width());
             objectOutputStream.writeObject(codebookSize);
             for (Vector vector : codebook) {
                 objectOutputStream.writeObject(vector.getPixels());
@@ -102,14 +104,14 @@ public class VectorQuantization {
         for (int index : compressedVectors)
             vectors.add(codebook.get(index));
 
-        int[][][] pixels = new int[originalDimension.getHeight()][originalDimension.getWidth()][3];
-        for (int i = 0; i < originalDimension.getHeight(); i++) {
-            int[][] row = new int[originalDimension.getWidth()][3];
-            for (int j = 0; j < originalDimension.getWidth(); j++) {
-                int vectorIndex = (i / vectorDimension.getHeight()) * (originalDimension.getWidth() / vectorDimension.getWidth()) + (j / vectorDimension.getWidth());
+        int[][][] pixels = new int[originalDimension.height()][originalDimension.width()][3];
+        for (int i = 0; i < originalDimension.height(); i++) {
+            int[][] row = new int[originalDimension.width()][3];
+            for (int j = 0; j < originalDimension.width(); j++) {
+                int vectorIndex = (i / vectorDimension.height()) * (originalDimension.width() / vectorDimension.width()) + (j / vectorDimension.width());
                 Vector vector = vectors.get(vectorIndex);
-                int vectorHeightIndex = i % vectorDimension.getHeight();
-                int vectorWidthIndex = j % vectorDimension.getWidth();
+                int vectorHeightIndex = i % vectorDimension.height();
+                int vectorWidthIndex = j % vectorDimension.width();
                 for (int k = 0; k < 3; k++) {
                     row[j][k] = vector.getPixel(vectorHeightIndex, vectorWidthIndex, k);
                 }

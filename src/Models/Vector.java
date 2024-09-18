@@ -14,10 +14,10 @@ public class Vector {
     public boolean equals(Vector vector) {
         if (vector == null)
             throw new NullPointerException("Vector cannot be null!");
-        if (vector.getHeight() != dimension.getHeight() || vector.getWidth() != dimension.getWidth())
+        if (vector.getHeight() != dimension.height() || vector.getWidth() != dimension.width())
             return false;
-        for (int i = 0; i < dimension.getHeight(); i++)
-            for (int j = 0; j < dimension.getWidth(); j++)
+        for (int i = 0; i < dimension.height(); i++)
+            for (int j = 0; j < dimension.width(); j++)
                 for (int k = 0; k < 3; k++)
                     if (pixels[i][j][k] != vector.getPixel(i, j, k))
                         return false;
@@ -28,27 +28,27 @@ public class Vector {
         if (vector == null)
             throw new NullPointerException("Vector cannot be null.");
         int sum = 0;
-        for (int i = 0; i < dimension.getHeight(); i++)
-            for (int j = 0; j < dimension.getWidth(); j++)
+        for (int i = 0; i < dimension.height(); i++)
+            for (int j = 0; j < dimension.width(); j++)
                 for (int k = 0; k < 3; k++)
                     sum += ((getPixel(i, j, k) - vector.getPixel(i, j, k)) * (getPixel(i, j, k) - vector.getPixel(i, j, k)));
         return sum;
     }
 
     public static Vector average(List<Vector> list, Dimension dimension) {
-        Vector result = new Vector(new int[dimension.getHeight()][dimension.getWidth()][3], dimension);
+        Vector result = new Vector(new int[dimension.height()][dimension.width()][3], dimension);
         if (list.isEmpty()) return result;
         for (Vector vector : list) {
-            for (int i = 0; i < dimension.getHeight(); i++) {
-                for (int j = 0; j < dimension.getWidth(); j++) {
+            for (int i = 0; i < dimension.height(); i++) {
+                for (int j = 0; j < dimension.width(); j++) {
                     for (int k = 0; k < 3; k++) {
                         result.setPixel(i, j, k, (result.getPixel(i, j, k) + vector.getPixel(i, j, k)));
                     }
                 }
             }
         }
-        for (int i = 0; i < dimension.getHeight(); i++) {
-            for (int j = 0; j < dimension.getWidth(); j++) {
+        for (int i = 0; i < dimension.height(); i++) {
+            for (int j = 0; j < dimension.width(); j++) {
                 for (int k = 0; k < 3; k++) {
                     result.setPixel(i, j, k, result.getPixel(i, j, k) / list.size());
                 }
@@ -69,8 +69,8 @@ public class Vector {
         Vector avgFirst = Vector.average(vectors, dimension);
         Vector avgSecond = Vector.average(vectors, dimension);
 
-        for (int i = 0; i < dimension.getHeight(); i++)
-            for (int j = 0; j < dimension.getWidth(); j++)
+        for (int i = 0; i < dimension.height(); i++)
+            for (int j = 0; j < dimension.width(); j++)
                 for (int k = 0; k < 3; k++)
                     avgSecond.setPixel(i, j, k, avgSecond.getPixel(i, j, k) + 1);
 
@@ -92,7 +92,7 @@ public class Vector {
     public void setPixels(int[][][] pixels) {
         if (pixels == null)
             throw new NullPointerException("Pixels cannot be null!");
-        if (pixels.length != dimension.getHeight() || pixels[0].length != dimension.getWidth())
+        if (pixels.length != dimension.height() || pixels[0].length != dimension.width())
             throw new IllegalArgumentException("The Dimension Height and Width must be equal to the pixel Height and Width!");
         this.pixels = pixels;
     }
@@ -104,26 +104,22 @@ public class Vector {
     }
 
     public int getPixel(int i, int j, int k) {
-        if (i < 0 || i >= dimension.getHeight() || j < 0 || j >= dimension.getWidth() || k < 0 || k > 2)
+        if (i < 0 || i >= dimension.height() || j < 0 || j >= dimension.width() || k < 0 || k > 2)
             throw new IllegalArgumentException("Index out of bounds.");
         return pixels[i][j][k];
     }
 
     public void setPixel(int i, int j, int k, int value) {
-        if (i < 0 || i >= dimension.getHeight() || j < 0 || j >= dimension.getWidth() || k < 0 || k > 2)
+        if (i < 0 || i >= dimension.height() || j < 0 || j >= dimension.width() || k < 0 || k > 2)
             throw new IllegalArgumentException("Index out of bounds.");
         pixels[i][j][k] = value;
     }
 
-    public Dimension getDimension() {
-        return dimension;
-    }
-
     public int getWidth() {
-        return dimension.getWidth();
+        return dimension.width();
     }
 
     public int getHeight() {
-        return dimension.getHeight();
+        return dimension.height();
     }
 }

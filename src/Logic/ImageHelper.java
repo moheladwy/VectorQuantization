@@ -1,7 +1,6 @@
 package Logic;
 import Models.Dimension;
 import Models.Vector;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -18,9 +17,9 @@ public class ImageHelper {
     }
 
     public static BufferedImage convertPixelsToBufferedImage(int[][][] pixels, Dimension dimension2D) {
-        BufferedImage bufferedImage = new BufferedImage(dimension2D.getWidth(), dimension2D.getHeight(), BufferedImage.TYPE_INT_RGB);
-        for (int i = 0; i < dimension2D.getHeight(); i++) {
-            for (int j = 0; j < dimension2D.getWidth(); j++) {
+        BufferedImage bufferedImage = new BufferedImage(dimension2D.width(), dimension2D.height(), BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < dimension2D.height(); i++) {
+            for (int j = 0; j < dimension2D.width(); j++) {
                 int rgb = pixels[i][j][0] << 16 | pixels[i][j][1] << 8 | pixels[i][j][2];
                 bufferedImage.setRGB(j, i, rgb);
             }
@@ -67,11 +66,11 @@ public class ImageHelper {
 
     public static ArrayList<Vector> initializeVectors(BufferedImage image, Dimension vectorSize) {
         ArrayList<Vector> vectors = new ArrayList<>();
-        for (int i = 0; i < image.getHeight(); i += vectorSize.getHeight()) {
-            for (int j = 0; j < image.getWidth(); j += vectorSize.getWidth()) {
-                int[][][] pixels = new int[vectorSize.getHeight()][vectorSize.getWidth()][3];
-                for (int height = i; height < i + vectorSize.getHeight(); height++) {
-                    for (int width = j; width < j + vectorSize.getWidth(); width++) {
+        for (int i = 0; i < image.getHeight(); i += vectorSize.height()) {
+            for (int j = 0; j < image.getWidth(); j += vectorSize.width()) {
+                int[][][] pixels = new int[vectorSize.height()][vectorSize.width()][3];
+                for (int height = i; height < i + vectorSize.height(); height++) {
+                    for (int width = j; width < j + vectorSize.width(); width++) {
                         int rgb = image.getRGB(width, height);
                         int redValue = (rgb >> 16) & 0xff;
                         int greenValue = (rgb >> 8) & 0xff;

@@ -1,13 +1,14 @@
 package GUI;
-import javax.swing.*;
-import java.awt.*;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 import Logic.ImageHelper;
 import Logic.VectorQuantization;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class Form {
     private JFrame frame;
@@ -17,7 +18,6 @@ public class Form {
     JButton compressButton;
     JButton clearImageButton;
     private File selectedFile;
-    private File compressedFile;
     private File decompressedFile;
     private BufferedImage decompressedImage;
     private final Dimension MIN_FRAME_DIMENSION;
